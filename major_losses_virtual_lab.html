@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Virtual Lab – Major Losses in Pipes</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+<style>
+/* ─── CSS VARIABLES ─── */
+:root{
+  --bg:#0a0e1a;
+  --bg2:#0f1625;
+  --bg3:#141d30;
+  --card:#1a2340;
+  --card2:#1f2a4a;
+  --border:#2a3a5c;
+  --accent:#00d4ff;
+  --accent2:#0099cc;
+  --green:#00ff88;
+  --yellow:#ffd700;
+  --red:#ff4757;
+  --orange:#ff6b35;
+  --text:#e8f0fe;
+  --text2:#8899bb;
+  --text3:#b0c4de;
+  --font:'Exo 2',sans-serif;
+  --mono:'Share Tech Mono',monospace;
+  --head:'Rajdhani',sans-serif;
+  --glow:0 0 20px rgba(0,212,255,0.3);
+  --glow2:0 0 40px rgba(0,212,255,0.15);
+}
+.light-mode{
+  --bg:#f0f4f8;--bg2:#e8eef6;--bg3:#dce6f0;
+  --card:#ffffff;--card2:#f5f8ff;--border:#c0d0e8;
+  --accent:#0066cc;--accent2:#0055aa;--green:#00aa55;
+  --yellow:#cc8800;--red:#cc2233;--orange:#dd5500;
+  --text:#1a2a4a;--text2:#4a6080;--text3:#2a4060;
+  --glow:0 0 20px rgba(0,102,204,0.2);
+  --glow2:0 0 40px rgba(0,102,204,0.1);
+}
+
+/* ─── RESET ─── */
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
+
+/* ─── LOADING SCREEN ─── */
+#loader{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .5s}
+#loader.hide{opacity:0;pointer-events:none}
+.loader-title{font-family:var(--head);font-size:2rem;font-weight:700;color:var(--accent);letter-spacing:4px}
+.loader-bar-wrap{width:300px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.loader-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:2px;transition:width .1s}
+.loader-sub{font-family:var(--mono);font-size:.75rem;color:var(--text2);letter-spacing:2px}
+
+/* ─── HEADER ─── */
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.logo-area{display:flex;align-items:center;gap:14px}
+.logo-icon{width:40px;height:40px;border:2px solid var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:700;color:var(--accent);font-size:1rem}
+.logo-text{font-family:var(--head);font-weight:700;font-size:1rem;color:var(--text);line-height:1.2}
+.logo-text span{font-size:.7rem;color:var(--text2);font-weight:400;display:block}
+.header-right{display:flex;align-items:center;gap:12px}
+.theme-btn{background:var(--card);border:1px solid var(--border);color:var(--text2);padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.8rem;transition:all .3s}
+.theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ─── NAV TABS ─── */
+.nav-tabs{background:var(--bg3);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;scrollbar-width:none;padding:0 16px;gap:2px}
+.nav-tabs::-webkit-scrollbar{display:none}
+.tab-btn{padding:14px 18px;background:none;border:none;color:var(--text2);font-family:var(--font);font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all .3s;letter-spacing:.5px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ─── SECTIONS ─── */
+.section{display:none;padding:32px 24px;max-width:1200px;margin:0 auto;animation:fadeIn .4s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── HERO ─── */
+.hero{background:linear-gradient(135deg,var(--bg2) 0%,var(--bg3) 100%);border:1px solid var(--border);border-radius:16px;padding:40px;margin-bottom:28px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(0,212,255,.06) 0%,transparent 70%)}
+.hero-badge{display:inline-block;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:var(--accent);padding:4px 12px;border-radius:20px;font-family:var(--mono);font-size:.7rem;letter-spacing:2px;margin-bottom:16px}
+.hero h1{font-family:var(--head);font-size:2.4rem;font-weight:800;line-height:1.2;margin-bottom:10px;background:linear-gradient(135deg,var(--text) 40%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--text2);font-size:1rem;max-width:600px;line-height:1.6}
+.hero-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}
+.hero-stat{background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.hero-stat .val{font-family:var(--head);font-size:1.4rem;font-weight:700;color:var(--accent)}
+.hero-stat .lbl{font-size:.7rem;color:var(--text2);margin-top:2px;font-family:var(--mono)}
+
+/* ─── SECTION TITLE ─── */
+.sec-title{font-family:var(--head);font-size:1.6rem;font-weight:700;color:var(--accent);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ─── CARDS ─── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px}
+.card-title{font-family:var(--head);font-size:1.1rem;font-weight:600;color:var(--accent);margin-bottom:14px}
+.card p,.card li{color:var(--text3);line-height:1.8;font-size:.9rem}
+.card ul,.card ol{padding-left:20px}
+.card li{margin-bottom:6px}
+
+/* ─── EQUATION BOX ─── */
+.eq-box{background:var(--bg);border:1px solid var(--accent);border-radius:10px;padding:18px 24px;margin:16px 0;text-align:center;font-family:var(--mono);font-size:1.1rem;color:var(--accent);box-shadow:var(--glow)}
+.eq-box .eq-label{font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;display:block}
+.eq-vars{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-top:16px}
+.eq-var{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.8rem}
+.eq-var .sym{color:var(--accent);font-family:var(--mono);margin-right:6px}
+
+/* ─── PROCEDURE STEPS ─── */
+.steps{display:flex;flex-direction:column;gap:12px}
+.step{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;display:flex;gap:16px;align-items:flex-start;transition:border-color .3s}
+.step:hover{border-color:var(--accent)}
+.step-num{background:var(--accent);color:var(--bg);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0;font-family:var(--head)}
+.step p{color:var(--text3);font-size:.9rem;line-height:1.6;padding-top:3px}
+
+/* ─── SIMULATION ─── */
+.sim-layout{display:grid;grid-template-columns:300px 1fr;gap:20px}
+@media(max-width:900px){.sim-layout{grid-template-columns:1fr}}
+.sim-controls{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px}
+.ctrl-group{display:flex;flex-direction:column;gap:6px}
+.ctrl-label{font-family:var(--mono);font-size:.72rem;color:var(--text2);letter-spacing:1px;text-transform:uppercase;display:flex;justify-content:space-between}
+.ctrl-val{color:var(--accent);font-weight:700}
+input[type=range]{width:100%;accent-color:var(--accent);height:4px;cursor:pointer}
+.pipe-selector{display:flex;gap:8px}
+.pipe-btn{flex:1;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:var(--mono);font-size:.78rem;cursor:pointer;transition:all .3s;text-align:center}
+.pipe-btn.active{background:rgba(0,212,255,.15);border-color:var(--accent);color:var(--accent)}
+.ctrl-divider{height:1px;background:var(--border);margin:4px 0}
+.ctrl-title{font-family:var(--head);font-size:.9rem;font-weight:600;color:var(--text2);margin-bottom:4px}
+
+/* BUTTONS */
+.btn{padding:10px 20px;border:none;border-radius:8px;font-family:var(--head);font-size:.9rem;font-weight:600;cursor:pointer;transition:all .3s;letter-spacing:.5px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);box-shadow:var(--glow)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(0,212,255,.5)}
+.btn-success{background:linear-gradient(135deg,var(--green),#00cc66);color:var(--bg)}
+.btn-danger{background:linear-gradient(135deg,var(--red),#cc2233);color:#fff}
+.btn-warn{background:linear-gradient(135deg,var(--yellow),var(--orange));color:var(--bg)}
+.btn-sm{padding:7px 14px;font-size:.8rem}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+
+/* CANVAS */
+.canvas-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative}
+canvas{width:100%;height:auto;border-radius:8px;display:block}
+
+/* OUTPUT CARDS */
+.outputs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:16px}
+.out-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;transition:border-color .3s}
+.out-card.highlight{border-color:var(--accent);box-shadow:var(--glow)}
+.out-card .out-val{font-family:var(--head);font-size:1.4rem;font-weight:700;color:var(--accent);line-height:1}
+.out-card .out-unit{font-family:var(--mono);font-size:.65rem;color:var(--text2);margin-top:2px}
+.out-card .out-lbl{font-size:.7rem;color:var(--text2);margin-top:6px;letter-spacing:.5px}
+.flow-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:.7rem;font-family:var(--mono);font-weight:700;letter-spacing:1px;margin-top:6px}
+.flow-lam{background:rgba(0,255,136,.15);color:var(--green);border:1px solid var(--green)}
+.flow-tur{background:rgba(255,107,53,.15);color:var(--orange);border:1px solid var(--orange)}
+.flow-trans{background:rgba(255,215,0,.15);color:var(--yellow);border:1px solid var(--yellow)}
+
+/* OBSERVATION TABLE */
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+thead tr{background:var(--bg3)}
+th{padding:12px 14px;text-align:left;font-family:var(--mono);font-size:.72rem;color:var(--text2);letter-spacing:1px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px 14px;color:var(--text3);border-bottom:1px solid rgba(42,58,92,.4);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(0,212,255,.03)}
+.td-pipe1{color:#00d4ff}.td-pipe2{color:#00ff88}.td-pipe3{color:#ffd700}
+
+/* GRAPH */
+.graph-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+#graphCanvas{width:100%;border-radius:8px}
+
+/* CALC STEPS */
+.calc-step{background:var(--bg3);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:10px}
+.calc-step .cs-label{font-family:var(--mono);font-size:.7rem;color:var(--text2);margin-bottom:6px;letter-spacing:1px}
+.calc-step .cs-eq{font-family:var(--mono);color:var(--accent);font-size:.9rem}
+.calc-step .cs-result{color:var(--green);font-size:1rem;font-weight:700;margin-top:4px}
+
+/* VIVA */
+.viva-item{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.viva-q{padding:16px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:.9rem;font-weight:600;transition:background .3s}
+.viva-q:hover{background:var(--card2)}
+.viva-q .arrow{color:var(--accent);transition:transform .3s;font-size:1.1rem}
+.viva-q.open .arrow{transform:rotate(180deg)}
+.viva-a{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s}
+.viva-a.open{max-height:300px;padding:0 20px 16px}
+.viva-a p{color:var(--text3);font-size:.85rem;line-height:1.7}
+
+/* RESULT */
+.result-box{background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(0,255,136,.05));border:1px solid var(--accent);border-radius:16px;padding:32px;text-align:center;margin-bottom:24px}
+.result-box h2{font-family:var(--head);font-size:1.8rem;color:var(--green);margin-bottom:10px}
+.result-box p{color:var(--text3)}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.team-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center}
+.team-avatar{width:56px;height:56px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-family:var(--head);font-size:1.2rem;font-weight:700;color:var(--bg)}
+.team-name{font-weight:600;font-size:.9rem;margin-bottom:4px}
+.team-role{font-size:.75rem;color:var(--text2)}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .hero h1{font-size:1.6rem}
+  .hero-grid{grid-template-columns:1fr}
+  .nav-tabs .tab-btn{padding:12px 12px;font-size:.75rem}
+  .outputs{grid-template-columns:repeat(2,1fr)}
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+
+/* STATUS INDICATOR */
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;margin-right:6px}
+.status-dot.on{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* INFO BANNER */
+.info-banner{background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);border-radius:8px;padding:12px 16px;font-size:.82rem;color:var(--text2);margin-bottom:16px;display:flex;gap:8px;align-items:flex-start}
+.info-banner .icon{color:var(--accent);font-size:1rem;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loader">
+  <div class="loader-title">⚗ VIRTUAL LAB</div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="lbar"></div></div>
+  <div class="loader-sub" id="lsub">INITIALISING MODULES...</div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-area">
+    <div class="logo-icon">VL</div>
+    <div class="logo-text">
+      Virtual Laboratory
+      <span>Fluid Mechanics · Experiment 5</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <span style="font-family:var(--mono);font-size:.72rem;color:var(--text2)">
+      <span class="status-dot" id="simDot"></span><span id="simStatus">IDLE</span>
+    </span>
+    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">☀ Light Mode</button>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<div class="nav-tabs" id="navTabs">
+  <button class="tab-btn active" onclick="showTab('home')">🏠 Home</button>
+  <button class="tab-btn" onclick="showTab('aim')">🎯 Aim</button>
+  <button class="tab-btn" onclick="showTab('theory')">📐 Theory</button>
+  <button class="tab-btn" onclick="showTab('apparatus')">🔧 Apparatus</button>
+  <button class="tab-btn" onclick="showTab('procedure')">📋 Procedure</button>
+  <button class="tab-btn" onclick="showTab('simulation')">⚡ Simulation</button>
+  <button class="tab-btn" onclick="showTab('observations')">📊 Observations</button>
+  <button class="tab-btn" onclick="showTab('calculations')">🧮 Calculations</button>
+  <button class="tab-btn" onclick="showTab('graph')">📈 Graph</button>
+  <button class="tab-btn" onclick="showTab('result')">✅ Result</button>
+  <button class="tab-btn" onclick="showTab('viva')">❓ Viva</button>
+</div>
+
+<!-- ══════════════════════════════ HOME ══════════════════════════════ -->
+<div class="section active" id="sec-home">
+  <div class="hero">
+    <div class="hero-badge">FLUID MECHANICS · EXPERIMENT 05</div>
+    <h1>Major Losses in Pipe Flow<br>Due to Friction</h1>
+    <p>To determine the head loss due to friction and the coefficient of friction in pipes using the Darcy-Weisbach equation and Reynolds number analysis.</p>
+    <div class="hero-grid">
+      <div class="hero-stat"><div class="val">3</div><div class="lbl">PIPE DIAMETERS</div></div>
+      <div class="hero-stat"><div class="val">Darcy-Weisbach</div><div class="lbl">PRIMARY FORMULA</div></div>
+      <div class="hero-stat"><div class="val">f vs Rₙ</div><div class="lbl">RESULT GRAPH</div></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+    <div class="card">
+      <div class="card-title">📌 Experiment Objective</div>
+      <p>Determine the coefficient of friction <strong style="color:var(--accent)">f</strong> for different pipe diameters under varying flow conditions and plot <strong style="color:var(--accent)">f vs Rₙ</strong> (Reynolds number) graph.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">🔬 Key Formula</div>
+      <div style="font-family:var(--mono);color:var(--accent);font-size:1rem;text-align:center;padding:8px">hf = 4fLV² / 2gd</div>
+      <p style="font-size:.8rem">Darcy-Weisbach equation relating head loss to velocity, friction factor and pipe geometry.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">⚙ How to Use</div>
+      <ol style="padding-left:16px">
+        <li style="color:var(--text3);font-size:.85rem;margin-bottom:4px">Select a pipe (P1 / P2 / P3)</li>
+        <li style="color:var(--text3);font-size:.85rem;margin-bottom:4px">Adjust manometer reading (hHg) and time (t)</li>
+        <li style="color:var(--text3);font-size:.85rem;margin-bottom:4px">Click <strong style="color:var(--green)">Start Flow</strong></li>
+        <li style="color:var(--text3);font-size:.85rem">Click <strong style="color:var(--yellow)">Add Reading</strong> to log data</li>
+      </ol>
+    </div>
+    <div class="card">
+      <div class="card-title">👥 Team Members</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:.8rem">S1</div><div><div style="font-size:.85rem;font-weight:600">Student 1</div><div style="font-size:.72rem;color:var(--text2)">Roll No. — XX</div></div></div>
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--bg);font-weight:700;font-size:.8rem">S2</div><div><div style="font-size:.85rem;font-weight:600">Student 2</div><div style="font-size:.72rem;color:var(--text2)">Roll No. — XX</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ AIM ══════════════════════════════ -->
+<div class="section" id="sec-aim">
+  <div class="sec-title">🎯 Aim</div>
+  <div class="card">
+    <div class="card-title">Primary Objective</div>
+    <p style="font-size:1rem;color:var(--text)">To determine <strong style="color:var(--accent)">loss of head</strong> and the <strong style="color:var(--accent)">coefficient of friction</strong> in pipes — Major Losses in pipes.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:8px">
+    <div class="card"><div class="card-title">📏 Measure</div><p>Head loss due to friction (hf) for different flow rates in pipes of different diameters.</p></div>
+    <div class="card"><div class="card-title">📐 Calculate</div><p>Coefficient of friction (f) using Darcy-Weisbach equation from measured hf and velocity.</p></div>
+    <div class="card"><div class="card-title">🔢 Determine</div><p>Reynolds number (Rₙ) to classify flow as laminar, transitional, or turbulent.</p></div>
+    <div class="card"><div class="card-title">📈 Plot</div><p>Graph of f vs Rₙ for each pipe at different values of hf to study the relationship.</p></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ THEORY ══════════════════════════════ -->
+<div class="section" id="sec-theory">
+  <div class="sec-title">📐 Theory</div>
+  <div class="card">
+    <div class="card-title">Pipe Flow & Energy Losses</div>
+    <p>A pipe is a closed conduit, generally of circular cross section used for conveying water or any other fluid. When the pipe is running full, the flow is under pressure and is known as <strong style="color:var(--accent)">pipe flow</strong>. When a fluid flows through a pipe, certain resistance is offered to the flowing fluid, resulting in a <strong style="color:var(--accent)">loss of energy</strong>. The various losses in pipes are broadly classified as:</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px"><strong style="color:var(--accent)">Major Losses</strong><p style="margin-top:6px;font-size:.85rem">Caused by friction along the pipe length. Dominant in long pipes.</p></div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px"><strong style="color:var(--text2)">Minor Losses</strong><p style="margin-top:6px;font-size:.85rem">Caused by bends, valves, expansions, contractions, fittings.</p></div>
+    </div>
+    <p style="margin-top:14px">The resistance to flow is due to: viscosity at the boundary and fluid layers, obstructions (gates, valves, orifices, bends), and sudden changes in flow direction.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Darcy-Weisbach Equation</div>
+    <p>A rational formula for the loss of head in a pipe due to friction may be obtained by using the <strong style="color:var(--accent)">Darcy-Weisbach</strong> equation:</p>
+    <div class="eq-box">
+      <span class="eq-label">Head Loss Due to Friction</span>
+      hf = ( 4 · f · L · V² ) / ( 2 · g · d )
+    </div>
+    <div class="eq-vars">
+      <div class="eq-var"><span class="sym">hf</span> = Head loss due to friction (m of water)</div>
+      <div class="eq-var"><span class="sym">f</span> = Coefficient of friction (dimensionless)</div>
+      <div class="eq-var"><span class="sym">L</span> = Length of pipe between pressure tappings (m)</div>
+      <div class="eq-var"><span class="sym">V</span> = Mean velocity of flow (m/s)</div>
+      <div class="eq-var"><span class="sym">d</span> = Diameter of pipe (m)</div>
+      <div class="eq-var"><span class="sym">g</span> = 9.81 m/s²</div>
+    </div>
+    <p style="margin-top:14px;font-size:.85rem;color:var(--text2)">Rearranging to find f from measurements:</p>
+    <div class="eq-box" style="margin-top:8px">
+      f = ( hf · g · d ) / ( 2 · L · V² )
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Reynolds Number & Flow Classification</div>
+    <p>The friction factor <strong style="color:var(--accent)">f</strong> is a dimensionless parameter. To know whether the flow is laminar or turbulent, Reynolds number is defined as:</p>
+    <div class="eq-box">
+      <span class="eq-label">Reynolds Number</span>
+      Rₙ = ( Vav · D ) / ν
+    </div>
+    <div class="eq-vars">
+      <div class="eq-var"><span class="sym">Vav</span> = Mean velocity of fluid (m/s)</div>
+      <div class="eq-var"><span class="sym">D</span> = Diameter at entry (m)</div>
+      <div class="eq-var"><span class="sym">ν</span> = Kinematic viscosity (m²/s) = μ/ρ</div>
+      <div class="eq-var"><span class="sym">μ</span> = Dynamic viscosity (Ns/m²)</div>
+      <div class="eq-var"><span class="sym">ρ</span> = Mass density (kg/m³)</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px">
+      <div style="background:rgba(0,255,136,.1);border:1px solid var(--green);border-radius:8px;padding:12px;text-align:center"><div style="color:var(--green);font-weight:700;font-size:.9rem">Rₙ &lt; 2000</div><div style="font-size:.78rem;color:var(--text2);margin-top:4px">LAMINAR</div></div>
+      <div style="background:rgba(255,215,0,.1);border:1px solid var(--yellow);border-radius:8px;padding:12px;text-align:center"><div style="color:var(--yellow);font-weight:700;font-size:.9rem">2000–4000</div><div style="font-size:.78rem;color:var(--text2);margin-top:4px">TRANSITIONAL</div></div>
+      <div style="background:rgba(255,107,53,.1);border:1px solid var(--orange);border-radius:8px;padding:12px;text-align:center"><div style="color:var(--orange);font-weight:700;font-size:.9rem">Rₙ &gt; 4000</div><div style="font-size:.78rem;color:var(--text2);margin-top:4px">TURBULENT</div></div>
+    </div>
+    <div class="eq-box" style="margin-top:14px">
+      <span class="eq-label">For Laminar Flow (Rₙ &lt; 2000)</span>
+      f = 16 / Rₙ
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Manometer Conversion</div>
+    <p>The differential manometer uses mercury (SG = 13.6) over water. The head loss in metres of water is:</p>
+    <div class="eq-box">hf = hHg × ( SG_Hg − 1 ) = hHg × 12.6</div>
+    <p style="font-size:.82rem;color:var(--text2);margin-top:8px">where hHg is the manometer reading in metres of mercury difference.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Discharge Calculation</div>
+    <p>Actual discharge is found by measuring the time for 20 cm (0.20 m) rise of water in the collecting tank:</p>
+    <div class="eq-box">Q = ( AT × R ) / t</div>
+    <div class="eq-vars">
+      <div class="eq-var"><span class="sym">AT</span> = Area of collecting tank (m²)</div>
+      <div class="eq-var"><span class="sym">R</span> = Rise of water = 0.20 m</div>
+      <div class="eq-var"><span class="sym">t</span> = Time taken for rise (s)</div>
+    </div>
+    <div class="eq-box" style="margin-top:12px">V = Q / A&nbsp;&nbsp;&nbsp;where&nbsp;&nbsp;&nbsp;A = π d² / 4</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ APPARATUS ══════════════════════════════ -->
+<div class="section" id="sec-apparatus">
+  <div class="sec-title">🔧 Apparatus</div>
+  <div class="info-banner"><span class="icon">ℹ</span> The experimental setup consists of three test pipes of different diameters connected to a supply system with a differential manometer for each pipe and a collecting tank for measuring discharge.</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+
+    <div class="card"><div class="card-title">🏭 Supply Tank & Pump</div>
+      <svg viewBox="0 0 240 120" style="width:100%;border-radius:8px;background:var(--bg3)">
+        <rect x="20" y="20" width="80" height="70" rx="4" fill="none" stroke="#2a3a5c" stroke-width="2"/>
+        <rect x="20" y="50" width="80" height="40" rx="0" fill="rgba(0,100,200,0.3)"/>
+        <text x="60" y="42" text-anchor="middle" fill="#8899bb" font-size="9">Supply Tank</text>
+        <rect x="130" y="50" width="40" height="30" rx="6" fill="none" stroke="#00d4ff" stroke-width="2"/>
+        <circle cx="150" cy="65" r="10" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+        <text x="150" y="69" text-anchor="middle" fill="#00d4ff" font-size="8">P</text>
+        <text x="150" y="105" text-anchor="middle" fill="#8899bb" font-size="9">Pump</text>
+        <line x1="100" y1="65" x2="130" y2="65" stroke="#00d4ff" stroke-width="2"/>
+        <line x1="170" y1="65" x2="200" y2="65" stroke="#00d4ff" stroke-width="2" marker-end="url(#arr)"/>
+        <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#00d4ff"/></marker></defs>
+      </svg>
+      <p style="margin-top:10px;font-size:.82rem">Overhead tank provides steady flow. Centrifugal pump circulates water through the pipe system.</p>
+    </div>
+
+    <div class="card"><div class="card-title">📏 Test Pipes (3 sizes)</div>
+      <svg viewBox="0 0 240 130" style="width:100%;border-radius:8px;background:var(--bg3)">
+        <!-- Pipe 1 -->
+        <rect x="20" y="20" width="200" height="14" rx="7" fill="none" stroke="#00d4ff" stroke-width="2"/>
+        <rect x="20" y="24" width="200" height="6" rx="0" fill="rgba(0,100,200,0.25)"/>
+        <text x="10" y="32" fill="#00d4ff" font-size="8" font-weight="bold">P1</text>
+        <text x="228" y="32" fill="#8899bb" font-size="7">d=25mm</text>
+        <!-- Pipe 2 -->
+        <rect x="20" y="55" width="200" height="20" rx="10" fill="none" stroke="#00ff88" stroke-width="2"/>
+        <rect x="20" y="61" width="200" height="8" rx="0" fill="rgba(0,180,80,0.2)"/>
+        <text x="10" y="68" fill="#00ff88" font-size="8" font-weight="bold">P2</text>
+        <text x="228" y="68" fill="#8899bb" font-size="7">d=32mm</text>
+        <!-- Pipe 3 -->
+        <rect x="20" y="94" width="200" height="26" rx="13" fill="none" stroke="#ffd700" stroke-width="2"/>
+        <rect x="20" y="101" width="200" height="11" rx="0" fill="rgba(255,215,0,0.15)"/>
+        <text x="10" y="111" fill="#ffd700" font-size="8" font-weight="bold">P3</text>
+        <text x="228" y="111" fill="#8899bb" font-size="7">d=40mm</text>
+      </svg>
+      <p style="margin-top:10px;font-size:.82rem">Three pipes of different diameters run in parallel. Flow is enabled in one pipe at a time using control valves.</p>
+    </div>
+
+    <div class="card"><div class="card-title">🌡 U-Tube Differential Manometer</div>
+      <svg viewBox="0 0 200 140" style="width:100%;border-radius:8px;background:var(--bg3)">
+        <line x1="60" y1="10" x2="60" y2="90" stroke="#8899bb" stroke-width="8" stroke-linecap="round"/>
+        <line x1="60" y1="90" x2="140" y2="90" stroke="#8899bb" stroke-width="8" stroke-linecap="round"/>
+        <line x1="140" y1="10" x2="140" y2="90" stroke="#8899bb" stroke-width="8" stroke-linecap="round"/>
+        <!-- Mercury -->
+        <rect x="56" y="60" width="8" height="34" fill="#c0c0c0" rx="0"/>
+        <rect x="56" y="86" width="88" height="8" fill="#c0c0c0"/>
+        <rect x="136" y="40" width="8" height="54" fill="#c0c0c0"/>
+        <!-- Water -->
+        <rect x="56" y="10" width="8" height="52" fill="rgba(0,100,200,0.5)" rx="0"/>
+        <rect x="136" y="10" width="8" height="32" fill="rgba(0,100,200,0.5)" rx="0"/>
+        <!-- Labels -->
+        <text x="40" y="65" fill="#8899bb" font-size="8" text-anchor="end">hHg</text>
+        <line x1="42" y1="62" x2="55" y2="62" stroke="#8899bb" stroke-width="1" stroke-dasharray="2"/>
+        <line x1="42" y1="42" x2="55" y2="42" stroke="#8899bb" stroke-width="1" stroke-dasharray="2"/>
+        <text x="95" y="120" text-anchor="middle" fill="#c0c0c0" font-size="9">Mercury (Hg)</text>
+        <text x="95" y="25" text-anchor="middle" fill="rgba(100,180,255,0.8)" font-size="8">Water</text>
+      </svg>
+      <p style="margin-top:10px;font-size:.82rem">Differential mercury manometer measures pressure difference between two tapping points. Mercury SG = 13.6.</p>
+    </div>
+
+    <div class="card"><div class="card-title">🪣 Collecting Tank</div>
+      <svg viewBox="0 0 200 130" style="width:100%;border-radius:8px;background:var(--bg3)">
+        <rect x="40" y="20" width="120" height="90" rx="4" fill="none" stroke="#2a3a5c" stroke-width="2"/>
+        <rect x="40" y="80" width="120" height="30" rx="0 0 4 4" fill="rgba(0,100,200,0.3)"/>
+        <line x1="30" y1="80" x2="50" y2="80" stroke="#ffd700" stroke-width="1.5" stroke-dasharray="3"/>
+        <text x="25" y="78" fill="#ffd700" font-size="8" text-anchor="end">20 cm</text>
+        <line x1="30" y1="100" x2="50" y2="100" stroke="#8899bb" stroke-width="1" stroke-dasharray="2"/>
+        <text x="25" y="105" fill="#8899bb" font-size="8" text-anchor="end">0 cm</text>
+        <text x="100" y="60" fill="#8899bb" font-size="9" text-anchor="middle">AT = 0.3 × 0.3</text>
+        <text x="100" y="72" fill="#8899bb" font-size="8" text-anchor="middle">= 0.09 m²</text>
+        <!-- Timer -->
+        <circle cx="155" cy="35" r="12" fill="none" stroke="#00d4ff" stroke-width="2"/>
+        <line x1="155" y1="35" x2="155" y2="26" stroke="#00d4ff" stroke-width="1.5"/>
+        <line x1="155" y1="35" x2="161" y2="39" stroke="#00d4ff" stroke-width="1.5"/>
+        <text x="155" y="58" fill="#00d4ff" font-size="7" text-anchor="middle">Stopwatch</text>
+      </svg>
+      <p style="margin-top:10px;font-size:.82rem">Time (t) for 20 cm rise is measured with stopwatch. Q = AT × 0.20 / t</p>
+    </div>
+
+    <div class="card"><div class="card-title">🔩 Control Valves</div>
+      <p>Gate valves control flow rate in each pipe individually. By partially closing the valve, the flow rate (and thus velocity) can be varied to take multiple readings for each pipe.</p>
+    </div>
+
+    <div class="card"><div class="card-title">📦 Lab Constants Used</div>
+      <div style="font-family:var(--mono);font-size:.8rem;display:flex;flex-direction:column;gap:6px;margin-top:4px">
+        <div><span style="color:var(--accent)">AT</span> = 0.09 m² (collecting tank area)</div>
+        <div><span style="color:var(--accent)">R</span>  = 0.20 m (rise of water)</div>
+        <div><span style="color:var(--accent)">L</span>  = 1.00 m (pipe length between taps)</div>
+        <div><span style="color:var(--accent)">g</span>  = 9.81 m/s²</div>
+        <div><span style="color:var(--accent)">ν</span>  = 1.007 × 10⁻⁶ m²/s (water at 20°C)</div>
+        <div><span style="color:var(--accent)">SG_Hg</span> = 13.6</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════ PROCEDURE ══════════════════════════════ -->
+<div class="section" id="sec-procedure">
+  <div class="sec-title">📋 Procedure</div>
+  <div class="info-banner"><span class="icon">ℹ</span> Follow the procedure exactly as specified in the module. The two primary measurements are the <strong style="color:var(--accent)">manometer reading (hHg)</strong> and the <strong style="color:var(--accent)">time (t)</strong> for 20 cm rise — all other values are computed from these.</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><p>Switch on the pump and <strong style="color:var(--accent)">enable flow in only one of the pipes</strong> by opening its control valve and keeping others closed.</p></div>
+    <div class="step"><div class="step-num">2</div><p><strong style="color:var(--accent)">Note down the manometer reading (hHg)</strong> — the difference in mercury levels in the U-tube manometer connected across the pipe. Record in cm or m of Hg.</p></div>
+    <div class="step"><div class="step-num">3</div><p><strong style="color:var(--accent)">Note the time (t)</strong> taken for 20 cm rise of water in the collecting tank using a stopwatch.</p></div>
+    <div class="step"><div class="step-num">4</div><p><strong style="color:var(--accent)">Repeat steps 2 and 3</strong> by altering the flow rate through the pipe using the control valve — take at least 5 readings per pipe.</p></div>
+    <div class="step"><div class="step-num">5</div><p><strong style="color:var(--accent)">Change the pipe</strong> — close the current pipe's valve and open the next pipe's valve. Repeat the procedure for each of the 3 pipes.</p></div>
+    <div class="step"><div class="step-num">6</div><p>After all readings: <strong style="color:var(--accent)">calculate hf, Q, V, Rₙ, and f</strong> for each reading using the formulas, and plot a graph of <strong style="color:var(--accent)">f vs Rₙ</strong> for each pipe.</p></div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-title">📌 Calculation Sequence (per reading)</div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-family:var(--mono);font-size:.82rem">
+      <div style="background:var(--bg3);padding:10px;border-radius:8px;border-left:3px solid var(--accent)">Step 1 · hf = hHg × 12.6 &nbsp;&nbsp;&nbsp;← head loss in metres of water</div>
+      <div style="background:var(--bg3);padding:10px;border-radius:8px;border-left:3px solid var(--accent)">Step 2 · Q = AT × R / t &nbsp;&nbsp;&nbsp;← actual discharge (m³/s)</div>
+      <div style="background:var(--bg3);padding:10px;border-radius:8px;border-left:3px solid var(--accent)">Step 3 · A = π d² / 4 &nbsp;&nbsp;&nbsp;← pipe cross-section (m²)</div>
+      <div style="background:var(--bg3);padding:10px;border-radius:8px;border-left:3px solid var(--accent)">Step 4 · V = Q / A &nbsp;&nbsp;&nbsp;← mean velocity (m/s)</div>
+      <div style="background:var(--bg3);padding:10px;border-radius:8px;border-left:3px solid var(--accent)">Step 5 · Rₙ = V × d / ν &nbsp;&nbsp;&nbsp;← Reynolds number</div>
+      <div style="background:var(--bg3);padding:10px;border-radius:8px;border-left:3px solid var(--green)">Step 6 · f = hf × g × d / (2 × L × V²) &nbsp;&nbsp;&nbsp;← COEFFICIENT OF FRICTION</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ SIMULATION ══════════════════════════════ -->
+<div class="section" id="sec-simulation">
+  <div class="sec-title">⚡ Interactive Simulation</div>
+  <div class="info-banner"><span class="icon">⚙</span> Set the <strong style="color:var(--accent)">manometer reading (hHg)</strong> and <strong style="color:var(--accent)">time (t)</strong> — just as you would measure in the lab. All other values (hf, Q, V, Rₙ, f) are computed automatically.</div>
+
+  <div class="sim-layout">
+    <!-- CONTROLS -->
+    <div class="sim-controls">
+      <div class="ctrl-title">SELECT PIPE</div>
+      <div class="pipe-selector">
+        <button class="pipe-btn active" onclick="selectPipe(0)" id="pbtn0">P1<br><span style="font-size:.65rem">d=25mm</span></button>
+        <button class="pipe-btn" onclick="selectPipe(1)" id="pbtn1">P2<br><span style="font-size:.65rem">d=32mm</span></button>
+        <button class="pipe-btn" onclick="selectPipe(2)" id="pbtn2">P3<br><span style="font-size:.65rem">d=40mm</span></button>
+      </div>
+
+      <div class="ctrl-divider"></div>
+      <div class="ctrl-title">PRIMARY MEASUREMENTS</div>
+
+      <!-- hHg slider -->
+      <div class="ctrl-group">
+        <div class="ctrl-label">Manometer Reading hHg <span class="ctrl-val" id="lbl_hhg">0.020 m</span></div>
+        <input type="range" id="sl_hhg" min="1" max="30" step="1" value="5" oninput="simUpdate()"/>
+        <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--text2);font-family:var(--mono)"><span>0.001 m</span><span>0.030 m</span></div>
+      </div>
+
+      <!-- t slider -->
+      <div class="ctrl-group">
+        <div class="ctrl-label">Time for 20cm rise (t) <span class="ctrl-val" id="lbl_t">30.0 s</span></div>
+        <input type="range" id="sl_t" min="10" max="120" step="1" value="30" oninput="simUpdate()"/>
+        <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--text2);font-family:var(--mono)"><span>10 s</span><span>120 s</span></div>
+      </div>
+
+      <div class="ctrl-divider"></div>
+      <div class="ctrl-title">LAB CONSTANTS</div>
+
+      <!-- ν slider -->
+      <div class="ctrl-group">
+        <div class="ctrl-label">Kinematic Viscosity ν <span class="ctrl-val" id="lbl_nu">1.007e-6</span></div>
+        <input type="range" id="sl_nu" min="8" max="18" step="1" value="10" oninput="simUpdate()"/>
+        <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--text2);font-family:var(--mono)"><span>0.8e-6</span><span>1.8e-6 m²/s</span></div>
+      </div>
+
+      <!-- L slider -->
+      <div class="ctrl-group">
+        <div class="ctrl-label">Pipe Length L <span class="ctrl-val" id="lbl_L">1.00 m</span></div>
+        <input type="range" id="sl_L" min="5" max="30" step="1" value="10" oninput="simUpdate()"/>
+        <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--text2);font-family:var(--mono)"><span>0.5 m</span><span>3.0 m</span></div>
+      </div>
+
+      <div class="ctrl-divider"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="startBtn" onclick="startFlow()">▶ Start Flow</button>
+        <button class="btn btn-danger btn-sm" onclick="resetSim()">↺ Reset</button>
+      </div>
+      <button class="btn btn-success" onclick="addReading()" style="width:100%">＋ Add Reading to Table</button>
+    </div>
+
+    <!-- CANVAS + OUTPUTS -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="canvas-wrap">
+        <canvas id="simCanvas" width="640" height="320"></canvas>
+      </div>
+
+      <!-- LIVE OUTPUTS -->
+      <div class="outputs">
+        <div class="out-card highlight">
+          <div class="out-val" id="out_hf">—</div>
+          <div class="out-unit">metres of water</div>
+          <div class="out-lbl">HEAD LOSS hf</div>
+        </div>
+        <div class="out-card">
+          <div class="out-val" id="out_Q">—</div>
+          <div class="out-unit">×10⁻⁴ m³/s</div>
+          <div class="out-lbl">DISCHARGE Q</div>
+        </div>
+        <div class="out-card">
+          <div class="out-val" id="out_V">—</div>
+          <div class="out-unit">m/s</div>
+          <div class="out-lbl">VELOCITY V</div>
+        </div>
+        <div class="out-card">
+          <div class="out-val" id="out_Re">—</div>
+          <div class="out-unit">dimensionless</div>
+          <div class="out-lbl">REYNOLDS Rₙ</div>
+        </div>
+        <div class="out-card highlight">
+          <div class="out-val" id="out_f">—</div>
+          <div class="out-unit">dimensionless</div>
+          <div class="out-lbl">FRICTION COEFF f</div>
+          <div id="out_flow">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ OBSERVATIONS ══════════════════════════════ -->
+<div class="section" id="sec-observations">
+  <div class="sec-title">📊 Observation Table</div>
+  <div class="info-banner"><span class="icon">ℹ</span> Readings are added from the Simulation tab. Use the <strong style="color:var(--green)">＋ Add Reading</strong> button after setting your manometer reading and time values.</div>
+
+  <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+    <button class="btn btn-warn btn-sm" onclick="clearTable()">🗑 Clear Table</button>
+    <button class="btn btn-primary btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="btn btn-success btn-sm" onclick="autoGenerate()">⚡ Auto-Generate Demo Readings</button>
+  </div>
+
+  <div style="font-family:var(--mono);font-size:.75rem;color:var(--text2);margin-bottom:10px">
+    Constants: AT = 0.09 m² &nbsp;|&nbsp; R = 0.20 m &nbsp;|&nbsp; g = 9.81 m/s²
+  </div>
+
+  <div class="tbl-wrap">
+    <table id="obsTable">
+      <thead>
+        <tr>
+          <th>#</th><th>Pipe</th><th>d (m)</th><th>hHg (m)</th><th>t (s)</th><th>hf (m)</th><th>Q (m³/s)</th><th>A (m²)</th><th>V (m/s)</th><th>Rₙ</th><th>f</th><th>Flow Type</th>
+        </tr>
+      </thead>
+      <tbody id="obsTbody">
+        <tr><td colspan="12" style="text-align:center;color:var(--text2);padding:24px">No readings yet — go to Simulation and click "Add Reading"</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ CALCULATIONS ══════════════════════════════ -->
+<div class="section" id="sec-calculations">
+  <div class="sec-title">🧮 Step-by-Step Calculations</div>
+  <div class="info-banner"><span class="icon">ℹ</span> This shows the detailed calculation for the <strong style="color:var(--accent)">last reading added</strong>. Go to Simulation, set values, and add a reading to see it update.</div>
+
+  <div class="card">
+    <div class="card-title">Current Inputs</div>
+    <div id="calc-inputs" style="font-family:var(--mono);font-size:.85rem;color:var(--text2)">No reading recorded yet.</div>
+  </div>
+
+  <div id="calc-steps"></div>
+</div>
+
+<!-- ══════════════════════════════ GRAPH ══════════════════════════════ -->
+<div class="section" id="sec-graph">
+  <div class="sec-title">📈 f vs Rₙ Graph</div>
+  <div class="info-banner"><span class="icon">ℹ</span> Graph is plotted automatically from readings added in the Observation table. Add multiple readings across all 3 pipes to see the full graph.</div>
+  <div class="graph-wrap">
+    <canvas id="graphCanvas" width="800" height="450"></canvas>
+  </div>
+  <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:12px;font-size:.8rem">
+    <span style="color:#00d4ff">● Pipe 1 (d=25mm)</span>
+    <span style="color:#00ff88">● Pipe 2 (d=32mm)</span>
+    <span style="color:#ffd700">● Pipe 3 (d=40mm)</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ RESULT ══════════════════════════════ -->
+<div class="section" id="sec-result">
+  <div class="sec-title">✅ Result</div>
+  <div class="result-box">
+    <h2>✔ Experiment Completed Successfully</h2>
+    <p style="font-size:1rem;margin:8px 0">The head loss due to friction (hf) and the coefficient of friction (f) in pipes were determined successfully for three different pipe diameters using the <strong style="color:var(--accent)">Darcy-Weisbach equation</strong>.</p>
+    <p style="color:var(--text2);margin-top:8px">A graph of <strong>f vs Rₙ</strong> was plotted for different values of hf.</p>
+  </div>
+
+  <div id="result-summary" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:24px">
+    <div class="card"><div class="card-title" style="color:var(--text2)">No data yet</div><p>Add readings in the Simulation tab to see result summary.</p></div>
+  </div>
+
+  <div class="sec-title" style="font-size:1.2rem">👥 Team Members</div>
+  <div class="team-grid">
+    <div class="team-card"><div class="team-avatar">S1</div><div class="team-name">Student 1</div><div class="team-role">Roll No. XX</div></div>
+    <div class="team-card"><div class="team-avatar">S2</div><div class="team-name">Student 2</div><div class="team-role">Roll No. XX</div></div>
+    <div class="team-card"><div class="team-avatar">S3</div><div class="team-name">Student 3</div><div class="team-role">Roll No. XX</div></div>
+    <div class="team-card"><div class="team-avatar">S4</div><div class="team-name">Student 4</div><div class="team-role">Roll No. XX</div></div>
+  </div>
+  <div class="card" style="margin-top:20px;text-align:center">
+    <div style="font-size:2rem;margin-bottom:8px">🏫</div>
+    <div class="card-title">College Logo / Name Placeholder</div>
+    <p>Department of Mechanical Engineering · Fluid Mechanics Laboratory</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ VIVA ══════════════════════════════ -->
+<div class="section" id="sec-viva">
+  <div class="sec-title">❓ Viva Questions</div>
+  <div id="vivaList"></div>
+</div>
+
+<!-- ══════════════════════════════ JAVASCRIPT ══════════════════════════════ -->
+<script>
+/* ══ CONSTANTS ══ */
+const AT   = 0.09;    // collecting tank area (m²)
+const R    = 0.20;    // rise (m)
+const g    = 9.81;    // m/s²
+const SG   = 13.6;    // specific gravity of mercury
+const RISE = 12.6;    // SG-1 factor: hf = hHg × 12.6
+
+// Pipe definitions: [label, diameter_m, colour]
+const PIPES = [
+  { name:'Pipe 1', d:0.025, col:'#00d4ff' },
+  { name:'Pipe 2', d:0.032, col:'#00ff88' },
+  { name:'Pipe 3', d:0.040, col:'#ffd700' }
+];
+
+/* ══ STATE ══ */
+let curPipe   = 0;
+let flowing   = false;
+let animFrame = null;
+let particles = [];
+let manOffset = 0;      // animated manometer offset
+let tankLevel = 0;      // collecting tank fill (0-1)
+let lastReading = null; // for calculations tab
+let readings  = [];     // all logged readings
+let trialCount= 0;
+
+/* ══ LOADING SCREEN ══ */
+(function(){
+  const msgs = ['LOADING PHYSICS ENGINE...','BUILDING PIPE MODELS...','CALIBRATING MANOMETER...','READY'];
+  let p=0;
+  const bar  = document.getElementById('lbar');
+  const sub  = document.getElementById('lsub');
+  const itvl = setInterval(()=>{
+    p += 25;
+    bar.style.width = p+'%';
+    sub.textContent = msgs[Math.min(p/25-1,3)];
+    if(p>=100){
+      clearInterval(itvl);
+      setTimeout(()=>{
+        document.getElementById('loader').classList.add('hide');
+        simUpdate();
+        drawSim();
+      },400);
+    }
+  },300);
+})();
+
+/* ══ TAB NAVIGATION ══ */
+function showTab(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  const tabs = ['home','aim','theory','apparatus','procedure','simulation','observations','calculations','graph','result','viva'];
+  const idx  = tabs.indexOf(id);
+  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+  if(id==='graph') drawGraph();
+  if(id==='result') updateResult();
+}
+
+/* ══ THEME TOGGLE ══ */
+function toggleTheme(){
+  document.body.classList.toggle('light-mode');
+  document.getElementById('themeBtn').textContent =
+    document.body.classList.contains('light-mode') ? '🌙 Dark Mode' : '☀ Light Mode';
+  drawSim();
+  drawGraph();
+}
+
+/* ══ PIPE SELECTION ══ */
+function selectPipe(i){
+  curPipe = i;
+  document.querySelectorAll('.pipe-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+  simUpdate();
+  if(flowing){ stopFlow(); startFlow(); }
+}
+
+/* ══ READ SLIDER VALUES ══ */
+function getPhysics(){
+  const hHg = parseFloat(document.getElementById('sl_hhg').value) * 0.001; // cm→m (slider in mm)
+  // slider goes 1..30, value in mm → m
+  const hhg_m = parseFloat(document.getElementById('sl_hhg').value) / 1000;
+  const t     = parseFloat(document.getElementById('sl_t').value);
+  const nu    = parseFloat(document.getElementById('sl_nu').value) * 1e-7; // slider 8..18 → 0.8e-6..1.8e-6
+  const L     = parseFloat(document.getElementById('sl_L').value) * 0.1;   // slider 5..30 → 0.5..3.0 m
+  const d     = PIPES[curPipe].d;
+  const A     = Math.PI * d * d / 4;
+
+  /* ── CORRECT PHYSICS CHAIN (per module) ── */
+  const hf    = hhg_m * RISE;               // Step 1: hf = hHg × 12.6
+  const Q     = (AT * R) / t;              // Step 2: Q = AT×R/t
+  const V     = Q / A;                     // Step 4: V = Q/A
+  const Re    = (V * d) / nu;              // Step 5: Rₙ = V·d/ν
+  const f     = (hf * g * d) / (2 * L * V * V); // Step 6: f = hf·g·d/(2·L·V²)
+
+  let flowType = Re < 2000 ? 'Laminar' : Re < 4000 ? 'Transitional' : 'Turbulent';
+
+  return { hhg_m, t, nu, L, d, A, hf, Q, V, Re, f, flowType };
+}
+
+/* ══ UPDATE DISPLAY ══ */
+function simUpdate(){
+  const hhg_raw = parseFloat(document.getElementById('sl_hhg').value);
+  const t_raw   = parseFloat(document.getElementById('sl_t').value);
+  const nu_raw  = parseFloat(document.getElementById('sl_nu').value);
+  const L_raw   = parseFloat(document.getElementById('sl_L').value);
+
+  document.getElementById('lbl_hhg').textContent = (hhg_raw/1000).toFixed(3)+' m';
+  document.getElementById('lbl_t').textContent   = t_raw.toFixed(0)+' s';
+  document.getElementById('lbl_nu').textContent  = (nu_raw*1e-7).toExponential(3);
+  document.getElementById('lbl_L').textContent   = (L_raw*0.1).toFixed(2)+' m';
+
+  const p = getPhysics();
+
+  document.getElementById('out_hf').textContent = p.hf.toFixed(4);
+  document.getElementById('out_Q').textContent  = (p.Q*1e4).toFixed(3);
+  document.getElementById('out_V').textContent  = p.V.toFixed(4);
+  document.getElementById('out_Re').textContent = Math.round(p.Re).toLocaleString();
+  document.getElementById('out_f').textContent  = p.f.toFixed(5);
+
+  // Flow type badge
+  const fBadge = document.getElementById('out_flow');
+  fBadge.className = 'flow-badge ' + (p.flowType==='Laminar'?'flow-lam':p.flowType==='Turbulent'?'flow-tur':'flow-trans');
+  fBadge.textContent = p.flowType.toUpperCase();
+
+  if(!flowing) drawSim();
+}
+
+/* ══ SIMULATION ANIMATION ══ */
+function startFlow(){
+  if(flowing) return;
+  flowing = true;
+  document.getElementById('startBtn').textContent='⏸ Pause';
+  document.getElementById('simDot').className='status-dot on';
+  document.getElementById('simStatus').textContent='FLOWING';
+  particles = [];
+  tankLevel = 0;
+  animate();
+}
+
+function stopFlow(){
+  flowing = false;
+  if(animFrame){ cancelAnimationFrame(animFrame); animFrame=null; }
+  document.getElementById('startBtn').textContent='▶ Start Flow';
+  document.getElementById('simDot').className='status-dot';
+  document.getElementById('simStatus').textContent='IDLE';
+}
+
+function resetSim(){
+  stopFlow();
+  particles=[];
+  tankLevel=0;
+  manOffset=0;
+  document.getElementById('sl_hhg').value=5;
+  document.getElementById('sl_t').value=30;
+  document.getElementById('sl_nu').value=10;
+  document.getElementById('sl_L').value=10;
+  simUpdate();
+  drawSim();
+}
+
+function animate(){
+  if(!flowing){ return; }
+  const p = getPhysics();
+  const spd = Math.min(p.V*2, 8);
+
+  // Add particles
+  if(Math.random()<0.3){
+    particles.push({x:0, y:0, spd: spd + (Math.random()-0.5) });
+  }
+  particles = particles.filter(pt=>{
+    pt.x += pt.spd;
+    return pt.x < 700;
+  });
+
+  // Manometer animation toward target
+  const target = p.hf * 25; // scale
+  manOffset += (target - manOffset) * 0.05;
+
+  // Tank fill
+  const Q_norm = (p.Q / 5e-4); // normalise
+  tankLevel = Math.min(tankLevel + Q_norm * 0.002, 1);
+
+  drawSim(spd);
+  animFrame = requestAnimationFrame(animate);
+}
+
+/* ══ DRAW SIMULATION ══ */
+function drawSim(spd=0){
+  const canvas = document.getElementById('simCanvas');
+  const ctx    = canvas.getContext('2d');
+  const W=640, H=320;
+  const isLight = document.body.classList.contains('light-mode');
+  const bg  = isLight ? '#f0f4f8' : '#0f1625';
+  const bg2 = isLight ? '#dce6f0' : '#141d30';
+  const col = PIPES[curPipe].col;
+  const p   = getPhysics();
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  /* ─ PIPE ─ */
+  const py  = 140, ph = PIPES[curPipe].d * 1800; // pixel height
+  const px1=60, px2=500;
+
+  // Pipe walls
+  ctx.strokeStyle='#2a3a5c'; ctx.lineWidth=2;
+  ctx.beginPath();ctx.rect(px1, py-ph/2-2, px2-px1, ph+4);ctx.stroke();
+
+  // Water flow
+  if(flowing){
+    const grad = ctx.createLinearGradient(px1,0,px2,0);
+    grad.addColorStop(0,col+'33'); grad.addColorStop(0.5,col+'66'); grad.addColorStop(1,col+'33');
+    ctx.fillStyle=grad;
+    ctx.fillRect(px1,py-ph/2,px2-px1,ph);
+
+    // Flow particles
+    ctx.fillStyle=col;
+    particles.forEach(pt=>{
+      const x = px1 + (pt.x/700)*(px2-px1);
+      const y = py + (Math.random()-0.5)*ph*0.6;
+      ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fill();
+    });
+  } else {
+    ctx.fillStyle=col+'22';
+    ctx.fillRect(px1,py-ph/2,px2-px1,ph);
+  }
+
+  // Pipe label
+  ctx.fillStyle=col; ctx.font='bold 12px Share Tech Mono';
+  ctx.fillText(PIPES[curPipe].name+' — d='+Math.round(PIPES[curPipe].d*1000)+'mm', px1+10, py-ph/2-8);
+
+  // Pressure taps
+  const tap1x=160, tap2x=380;
+  ctx.strokeStyle=isLight?'#4a6080':'#8899bb'; ctx.lineWidth=2; ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(tap1x,py-ph/2-2);ctx.lineTo(tap1x,py-ph/2-30);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(tap2x,py-ph/2-2);ctx.lineTo(tap2x,py-ph/2-30);ctx.stroke();
+  ctx.setLineDash([]);
+
+  /* ─ U-TUBE MANOMETER ─ */
+  const mx=200, my=30, mw=60, mh=90;
+  const mn_scale = Math.min(manOffset,60);
+
+  ctx.strokeStyle='#2a3a5c'; ctx.lineWidth=5; ctx.lineJoin='round'; ctx.lineCap='round';
+  ctx.strokeRect(mx,my,mw,mh);
+
+  // Mercury fill
+  const lh = 40+mn_scale*0.5;
+  const rh = 40-mn_scale*0.5;
+  ctx.fillStyle='#b0b0b0';
+  ctx.fillRect(mx+2, my+mh-lh, 10, lh);
+  ctx.fillRect(mx+mw-12, my+mh-rh, 10, rh);
+  ctx.fillRect(mx+2, my+mh-8, mw-4, 8);
+
+  // Water above mercury
+  ctx.fillStyle='rgba(0,100,200,0.4)';
+  ctx.fillRect(mx+2, my, 10, mh-lh);
+  ctx.fillRect(mx+mw-12, my, 10, mh-rh);
+
+  // Manometer labels
+  ctx.fillStyle=isLight?'#4a6080':'#8899bb'; ctx.font='9px Share Tech Mono';
+  ctx.fillText('hHg='+(p.hhg_m*1000).toFixed(0)+'mm', mx-10, my-8);
+  ctx.fillText('hf='+p.hf.toFixed(3)+'m', mx-10, my-18);
+
+  // Connecting lines from taps to mano
+  ctx.strokeStyle='#2a3a5c'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(tap1x,py-ph/2-30);ctx.lineTo(mx+5,my+2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(tap2x,py-ph/2-30);ctx.lineTo(mx+mw-5,my+2);ctx.stroke();
+  ctx.setLineDash([]);
+
+  /* ─ COLLECTING TANK ─ */
+  const tx=530,ty=80,tw=80,th=120;
+  ctx.strokeStyle='#2a3a5c'; ctx.lineWidth=2;
+  ctx.strokeRect(tx,ty,tw,th);
+  // Water in tank
+  const wh = th * tankLevel;
+  const grad2 = ctx.createLinearGradient(0,ty+th-wh,0,ty+th);
+  grad2.addColorStop(0,'rgba(0,100,200,0.2)');
+  grad2.addColorStop(1,'rgba(0,100,200,0.5)');
+  ctx.fillStyle=grad2;
+  ctx.fillRect(tx+2,ty+th-wh,tw-4,wh);
+  // 20cm rise marker
+  ctx.strokeStyle=isLight?'#cc8800':'#ffd700'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  const riseY = ty+th - th*0.6;
+  ctx.beginPath();ctx.moveTo(tx-5,riseY);ctx.lineTo(tx+tw+5,riseY);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=isLight?'#cc8800':'#ffd700'; ctx.font='8px Share Tech Mono';
+  ctx.fillText('20cm', tx+tw+6, riseY+3);
+  ctx.fillStyle=isLight?'#4a6080':'#8899bb';
+  ctx.fillText('Tank', tx+tw/2-12, ty-8);
+
+  // Inlet to tank (pipe from test section)
+  ctx.strokeStyle=col+'88'; ctx.lineWidth=4;
+  ctx.beginPath();ctx.moveTo(px2,py);ctx.lineTo(tx,ty+30);ctx.stroke();
+
+  /* ─ SUPPLY TANK ─ */
+  ctx.strokeStyle='#2a3a5c'; ctx.lineWidth=2;
+  ctx.strokeRect(10,60,40,100);
+  ctx.fillStyle='rgba(0,100,200,0.3)';ctx.fillRect(12,100,36,58);
+  ctx.fillStyle=isLight?'#4a6080':'#8899bb';ctx.font='8px Share Tech Mono';
+  ctx.fillText('Sump',14,75);
+  // Pump pipe
+  ctx.strokeStyle=col+'88'; ctx.lineWidth=4;
+  ctx.beginPath();ctx.moveTo(50,140);ctx.lineTo(px1,py);ctx.stroke();
+
+  /* ─ CONTROL VALVE SYMBOL ─ */
+  ctx.strokeStyle='#2a3a5c'; ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(430,py-8);ctx.lineTo(450,py+8);ctx.moveTo(450,py-8);ctx.lineTo(430,py+8);ctx.stroke();
+  ctx.strokeRect(428,py-8,24,16);
+  ctx.fillStyle=isLight?'#4a6080':'#8899bb';ctx.font='8px Share Tech Mono';
+  ctx.fillText('Valve',427,py-14);
+
+  /* ─ BOTTOM LABELS ─ */
+  ctx.fillStyle=isLight?'#2a4060':'#b0c4de'; ctx.font='10px Share Tech Mono';
+  ctx.fillText('V='+p.V.toFixed(3)+'m/s', px1, H-14);
+  ctx.fillText('Rₙ='+Math.round(p.Re), px1+100, H-14);
+  ctx.fillText('f='+p.f.toFixed(5), px1+220, H-14);
+  ctx.fillText(p.flowType.toUpperCase(), px1+350, H-14);
+
+  // Flow arrow
+  if(flowing){
+    ctx.fillStyle=col; ctx.font='bold 14px Arial';
+    ctx.fillText('→→→', (px1+px2)/2-25, py+5);
+  }
+}
+
+/* ══ ADD READING ══ */
+function addReading(){
+  const p = getPhysics();
+  trialCount++;
+  const row = {
+    trial: trialCount,
+    pipe:  curPipe,
+    d:     p.d,
+    hhg:   p.hhg_m,
+    t:     p.t,
+    hf:    p.hf,
+    Q:     p.Q,
+    A:     p.A,
+    V:     p.V,
+    Re:    p.Re,
+    f:     p.f,
+    type:  p.flowType,
+    L:     p.L,
+    nu:    p.nu
+  };
+  readings.push(row);
+  lastReading = row;
+  renderTable();
+  updateCalcTab(row);
+  // Flash success
+  const btn = document.querySelector('.btn-success');
+  btn.textContent='✔ Reading Added!';
+  btn.style.background='linear-gradient(135deg,#00aa55,#008844)';
+  setTimeout(()=>{ btn.textContent='＋ Add Reading to Table'; btn.style.background=''; },1500);
+}
+
+/* ══ RENDER TABLE ══ */
+function renderTable(){
+  const tbody = document.getElementById('obsTbody');
+  if(!readings.length){
+    tbody.innerHTML='<tr><td colspan="12" style="text-align:center;color:var(--text2);padding:24px">No readings yet.</td></tr>';
+    return;
+  }
+  const pipeClass=['td-pipe1','td-pipe2','td-pipe3'];
+  tbody.innerHTML = readings.map(r=>`
+    <tr>
+      <td>${r.trial}</td>
+      <td class="${pipeClass[r.pipe]}">${PIPES[r.pipe].name}</td>
+      <td>${(r.d*1000).toFixed(0)} mm</td>
+      <td>${(r.hhg*1000).toFixed(1)} mm</td>
+      <td>${r.t.toFixed(1)} s</td>
+      <td>${r.hf.toFixed(4)}</td>
+      <td>${r.Q.toExponential(3)}</td>
+      <td>${r.A.toExponential(3)}</td>
+      <td>${r.V.toFixed(4)}</td>
+      <td>${Math.round(r.Re).toLocaleString()}</td>
+      <td>${r.f.toFixed(5)}</td>
+      <td>${r.type}</td>
+    </tr>`).join('');
+}
+
+/* ══ CALCULATIONS TAB ══ */
+function updateCalcTab(r){
+  document.getElementById('calc-inputs').innerHTML=`
+    <strong style="color:var(--accent)">${PIPES[r.pipe].name}</strong> &nbsp;|&nbsp;
+    hHg = ${(r.hhg*1000).toFixed(1)} mm &nbsp;|&nbsp; t = ${r.t.toFixed(1)} s &nbsp;|&nbsp;
+    d = ${(r.d*1000).toFixed(0)} mm &nbsp;|&nbsp; L = ${r.L.toFixed(2)} m &nbsp;|&nbsp;
+    ν = ${r.nu.toExponential(3)} m²/s
+  `;
+  document.getElementById('calc-steps').innerHTML=`
+    <div class="calc-step">
+      <div class="cs-label">STEP 1 · Head loss in metres of water</div>
+      <div class="cs-eq">hf = hHg × 12.6 = ${(r.hhg*1000).toFixed(1)}mm × 0.001 × 12.6</div>
+      <div class="cs-result">hf = ${r.hf.toFixed(5)} m</div>
+    </div>
+    <div class="calc-step">
+      <div class="cs-label">STEP 2 · Actual discharge</div>
+      <div class="cs-eq">Q = AT × R / t = 0.09 × 0.20 / ${r.t.toFixed(1)}</div>
+      <div class="cs-result">Q = ${r.Q.toExponential(4)} m³/s</div>
+    </div>
+    <div class="calc-step">
+      <div class="cs-label">STEP 3 · Pipe cross-section area</div>
+      <div class="cs-eq">A = π × d² / 4 = π × (${(r.d*1000).toFixed(0)}×10⁻³)² / 4</div>
+      <div class="cs-result">A = ${r.A.toExponential(4)} m²</div>
+    </div>
+    <div class="calc-step">
+      <div class="cs-label">STEP 4 · Mean velocity</div>
+      <div class="cs-eq">V = Q / A = ${r.Q.toExponential(3)} / ${r.A.toExponential(3)}</div>
+      <div class="cs-result">V = ${r.V.toFixed(4)} m/s</div>
+    </div>
+    <div class="calc-step">
+      <div class="cs-label">STEP 5 · Reynolds number</div>
+      <div class="cs-eq">Rₙ = V × d / ν = ${r.V.toFixed(4)} × ${(r.d*1000).toFixed(0)}e-3 / ${r.nu.toExponential(3)}</div>
+      <div class="cs-result">Rₙ = ${Math.round(r.Re).toLocaleString()} &nbsp;→&nbsp; ${r.type}</div>
+    </div>
+    <div class="calc-step" style="border-left-color:var(--green)">
+      <div class="cs-label">STEP 6 · Coefficient of friction (OUTPUT)</div>
+      <div class="cs-eq">f = hf × g × d / (2 × L × V²)</div>
+      <div class="cs-eq">f = ${r.hf.toFixed(5)} × 9.81 × ${(r.d*1000).toFixed(0)}e-3 / (2 × ${r.L.toFixed(2)} × ${r.V.toFixed(4)}²)</div>
+      <div class="cs-result" style="font-size:1.1rem">f = ${r.f.toFixed(6)}</div>
+    </div>
+  `;
+}
+
+/* ══ GRAPH ══ */
+function drawGraph(){
+  const canvas = document.getElementById('graphCanvas');
+  const ctx    = canvas.getContext('2d');
+  const W=800, H=450;
+  const isLight = document.body.classList.contains('light-mode');
+  const bg  = isLight?'#f0f4f8':'#0f1625';
+  const gridC= isLight?'#c0d0e8':'#1e2d48';
+  const textC= isLight?'#2a4060':'#8899bb';
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  const pad={l:70,r:40,t:40,b:60};
+  const gw=W-pad.l-pad.r, gh=H-pad.t-pad.b;
+
+  if(!readings.length){
+    ctx.fillStyle=textC;ctx.font='16px Share Tech Mono';ctx.textAlign='center';
+    ctx.fillText('No readings yet — add readings in the Simulation tab',W/2,H/2);
+    return;
+  }
+
+  // Compute ranges
+  const allRe = readings.map(r=>r.Re);
+  const allF  = readings.map(r=>r.f);
+  const minRe = Math.min(...allRe)*0.8, maxRe = Math.max(...allRe)*1.2;
+  const minF  = 0, maxF  = Math.max(...allF)*1.3;
+
+  // Helper → pixel
+  const px=(re)=> pad.l + (re-minRe)/(maxRe-minRe)*gw;
+  const py=(f)=>  pad.t + gh - (f-minF)/(maxF-minF)*gh;
+
+  // Grid
+  ctx.strokeStyle=gridC; ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){
+    const y=pad.t+i*gh/5;
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+gw,y);ctx.stroke();
+    const val = maxF - i*(maxF-minF)/5;
+    ctx.fillStyle=textC;ctx.font='11px Share Tech Mono';ctx.textAlign='right';
+    ctx.fillText(val.toFixed(4),pad.l-6,y+4);
+  }
+  for(let i=0;i<=5;i++){
+    const x=pad.l+i*gw/5;
+    ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+gh);ctx.stroke();
+    const val = minRe + i*(maxRe-minRe)/5;
+    ctx.fillStyle=textC;ctx.font='11px Share Tech Mono';ctx.textAlign='center';
+    ctx.fillText(Math.round(val).toLocaleString(),x,pad.t+gh+18);
+  }
+
+  // Axes
+  ctx.strokeStyle=isLight?'#4a6080':'#8899bb'; ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,pad.t+gh);ctx.lineTo(pad.l+gw,pad.t+gh);ctx.stroke();
+
+  // Axis labels
+  ctx.fillStyle=isLight?'#2a4060':'#b0c4de';ctx.font='13px Share Tech Mono';ctx.textAlign='center';
+  ctx.fillText('Reynolds Number (Rₙ)',pad.l+gw/2,H-10);
+  ctx.save();ctx.translate(16,pad.t+gh/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText('Friction Coefficient (f)',0,0);ctx.restore();
+
+  // Title
+  ctx.fillStyle=isLight?'#0066cc':'#00d4ff';ctx.font='bold 14px Share Tech Mono';ctx.textAlign='center';
+  ctx.fillText('f  vs  Rₙ  Graph',pad.l+gw/2,22);
+
+  // Plot points per pipe
+  PIPES.forEach((pp,pi)=>{
+    const rows = readings.filter(r=>r.pipe===pi);
+    if(!rows.length) return;
+    ctx.strokeStyle=pp.col; ctx.lineWidth=2;
+
+    // Line
+    ctx.beginPath();
+    rows.sort((a,b)=>a.Re-b.Re).forEach((r,i)=>{
+      const x=px(r.Re), y=py(r.f);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    // Dots
+    rows.forEach(r=>{
+      ctx.beginPath();ctx.arc(px(r.Re),py(r.f),5,0,Math.PI*2);
+      ctx.fillStyle=pp.col; ctx.fill();
+      ctx.strokeStyle=bg; ctx.lineWidth=2; ctx.stroke();
+    });
+  });
+
+  ctx.lineWidth=1;
+}
+
+/* ══ RESULT SUMMARY ══ */
+function updateResult(){
+  if(!readings.length) return;
+  const div=document.getElementById('result-summary');
+  const pipeData = PIPES.map((pp,pi)=>{
+    const rows = readings.filter(r=>r.pipe===pi);
+    if(!rows.length) return null;
+    const avgF = rows.reduce((s,r)=>s+r.f,0)/rows.length;
+    return { name:pp.name, d:pp.d, col:pp.col, n:rows.length, avgF };
+  }).filter(Boolean);
+
+  div.innerHTML = pipeData.map(pd=>`
+    <div class="card" style="border-color:${pd.col}33">
+      <div class="card-title" style="color:${pd.col}">${pd.name} (d=${(pd.d*1000).toFixed(0)}mm)</div>
+      <div style="font-family:var(--mono);font-size:.85rem">
+        <div>Readings: <strong style="color:var(--text)">${pd.n}</strong></div>
+        <div>Average f: <strong style="color:${pd.col}">${pd.avgF.toFixed(5)}</strong></div>
+      </div>
+    </div>`).join('');
+}
+
+/* ══ CLEAR / EXPORT ══ */
+function clearTable(){ readings=[]; trialCount=0; lastReading=null; renderTable(); }
+
+function exportCSV(){
+  if(!readings.length){ alert('No readings to export.'); return; }
+  const header = 'Trial,Pipe,d(mm),hHg(mm),t(s),hf(m),Q(m3/s),A(m2),V(m/s),Re,f,FlowType\n';
+  const rows = readings.map(r=>
+    [r.trial,PIPES[r.pipe].name,(r.d*1000).toFixed(0),(r.hhg*1000).toFixed(1),r.t.toFixed(1),
+     r.hf.toFixed(5),r.Q.toExponential(4),r.A.toExponential(4),r.V.toFixed(4),
+     Math.round(r.Re),r.f.toFixed(6),r.type].join(',')
+  ).join('\n');
+  const blob = new Blob([header+rows],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='major_losses_data.csv';a.click();
+}
+
+/* ══ AUTO-GENERATE DEMO READINGS ══ */
+function autoGenerate(){
+  // Generate 5 readings per pipe with varied hHg and t
+  const configs = [
+    // [pipe, hHg_mm, t_s]
+    [0,3,50],[0,6,35],[0,10,25],[0,16,18],[0,22,14],
+    [1,3,60],[1,6,42],[1,10,30],[1,16,22],[1,22,17],
+    [2,3,75],[2,6,52],[2,10,38],[2,16,28],[2,22,21],
+  ];
+  configs.forEach(([pi,hhg_mm,t])=>{
+    const d   = PIPES[pi].d;
+    const A   = Math.PI*d*d/4;
+    const hhg = hhg_mm/1000;
+    const hf  = hhg*RISE;
+    const Q   = (AT*R)/t;
+    const V   = Q/A;
+    const nu  = 1.007e-6;
+    const L   = 1.0;
+    const Re  = V*d/nu;
+    const f   = (hf*g*d)/(2*L*V*V);
+    trialCount++;
+    readings.push({trial:trialCount,pipe:pi,d,hhg,t,hf,Q,A,V,Re,f,
+      type:Re<2000?'Laminar':Re<4000?'Transitional':'Turbulent',L,nu});
+  });
+  renderTable();
+  if(readings.length) updateCalcTab(readings[readings.length-1]);
+  alert('15 demo readings added (5 per pipe). Check Observations and Graph tabs!');
+}
+
+/* ══ VIVA QUESTIONS ══ */
+const VIVA = [
+  {q:'What is the Darcy-Weisbach equation? State each variable.',
+   a:'hf = 4fLV² / 2gd. Here hf = head loss (m of water), f = coefficient of friction (dimensionless), L = length between pressure taps (m), V = mean velocity (m/s), g = 9.81 m/s², d = pipe diameter (m). It relates frictional head loss to flow velocity and pipe geometry.'},
+  {q:'What is major loss in pipe flow?',
+   a:'Major loss is the head loss due to friction along the length of the pipe. It is the dominant energy loss in long pipes and is described by the Darcy-Weisbach equation. It is directly proportional to pipe length and velocity head, and inversely proportional to pipe diameter.'},
+  {q:'What is the difference between laminar and turbulent flow?',
+   a:'In laminar flow (Rₙ < 2000), fluid moves in smooth parallel layers with no mixing. In turbulent flow (Rₙ > 4000), the flow is chaotic with eddies and mixing. Transitional flow occurs between 2000 and 4000. Turbulent flow has a higher friction coefficient and greater head loss.'},
+  {q:'How is Reynolds number calculated and what does it signify?',
+   a:'Rₙ = Vav × D / ν, where Vav is mean velocity, D is pipe diameter, and ν is kinematic viscosity. It is the ratio of inertial forces to viscous forces. A high Rₙ means inertia dominates (turbulent), a low Rₙ means viscosity dominates (laminar). It predicts the flow regime.'},
+  {q:'What is kinematic viscosity? How is it related to dynamic viscosity?',
+   a:'Kinematic viscosity ν = μ/ρ, where μ is dynamic viscosity (Ns/m²) and ρ is mass density (kg/m³). It represents the fluid\'s resistance to flow under gravity. For water at 20°C, ν ≈ 1.007 × 10⁻⁶ m²/s.'},
+  {q:'Why is mercury used in the differential manometer?',
+   a:'Mercury (SG = 13.6) is much denser than water, so small pressure differences produce easily readable mercury level differences. The conversion is hf = hHg × (13.6 - 1) = hHg × 12.6. Using water would require very tall manometer tubes for the same pressure difference.'},
+  {q:'What are minor losses? Give examples.',
+   a:'Minor losses occur due to local disturbances in the flow caused by fittings, bends, valves, sudden expansions, contractions, inlets, and outlets. They are expressed as hm = K × V²/2g where K is the loss coefficient. In short pipes, minor losses can be significant.'},
+  {q:'What is the relationship between f and Rₙ for laminar flow?',
+   a:'For laminar flow (Rₙ < 2000), the coefficient of friction is given by f = 16/Rₙ. This is derived analytically from the Hagen-Poiseuille law. It shows that f decreases linearly with increasing Reynolds number in laminar flow.'},
+  {q:'Why do we use 20 cm rise in the collecting tank for discharge measurement?',
+   a:'A fixed rise of 20 cm (R = 0.20 m) is used to ensure consistent and accurate timing. With a known tank area (AT), the actual discharge Q = AT × R / t. A larger rise reduces the percentage error in timing. The measurement is simple, direct, and doesn\'t require a flow meter.'},
+  {q:'If the flow rate increases, how does the head loss change?',
+   a:'From hf = 4fLV²/2gd, head loss is proportional to V² (velocity squared). So if flow rate (and velocity) doubles, head loss increases by a factor of 4 — provided f remains roughly constant (which is approximately true in fully turbulent flow). This quadratic relationship is the key result of this experiment.'},
+];
+
+(function buildViva(){
+  const div=document.getElementById('vivaList');
+  div.innerHTML = VIVA.map((v,i)=>`
+    <div class="viva-item">
+      <div class="viva-q" onclick="toggleViva(${i})" id="vq${i}">
+        <span><span style="color:var(--accent);font-family:var(--mono);margin-right:8px">Q${i+1}.</span>${v.q}</span>
+        <span class="arrow" id="va${i}">▾</span>
+      </div>
+      <div class="viva-a" id="vans${i}"><p>${v.a}</p></div>
+    </div>`).join('');
+})();
+
+function toggleViva(i){
+  const q=document.getElementById('vq'+i);
+  const a=document.getElementById('vans'+i);
+  const ar=document.getElementById('va'+i);
+  const open=a.classList.toggle('open');
+  q.classList.toggle('open',open);
+  ar.textContent=open?'▴':'▾';
+}
+
+/* ══ INITIAL DRAW ══ */
+window.addEventListener('resize',()=>{ drawSim(); drawGraph(); });
+</script>
+</body>
+</html>
